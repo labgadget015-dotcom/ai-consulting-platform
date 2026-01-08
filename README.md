@@ -2,6 +2,12 @@
 
 AI-powered consulting platform for small e-commerce and retail businesses. Automated insights for forecasting, inventory optimization, and churn prediction.
 
+
+![CI/CD](https://github.com/labgadget015-dotcom/ai-consulting-platform/workflows/CI%2FCD/badge.svg)
+![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
+![Code Quality](https://img.shields.io/badge/code%20quality-A-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Maintained](https://img.shields.io/badge/maintained-yes-brightgreen.svg)
 ## 🎯 V1 Scope
 
 - **Industries**: E-commerce + Retail (healthcare Phase 2)
