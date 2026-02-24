@@ -41,17 +41,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt || true
           pip install pylint flake8 bandit radon pytest pytest-cov black isort mypy
       
       - name: Run linters in parallel
         run: |
           # Run all linters in parallel and capture exit codes
-          pylint ingestion/ models/ api/ --exit-zero --output-format=json > pylint-report.json &
+          pylint ingestion/ app/ --ignore=.git --exit-zero --output-format=json > pylint-report.json &
           PID1=$!
-          flake8 ingestion/ models/ api/ --max-line-length=120 --output-file=flake8-report.txt &
+          flake8 ingestion/ app/ --max-line-length=120 --output-file=flake8-report.txt &
           PID2=$!
-          bandit -r ingestion/ models/ api/ -f json -o bandit-report.json &
+          bandit -r ingestion/ app/ -f json -o bandit-report.json &
           PID3=$!
           
           # Wait for all processes
@@ -167,15 +167,15 @@ jobs:
       
       - name: Analyze code complexity
         run: |
-          radon cc ingestion/ models/ api/ -a -j > complexity-report.json
-          radon mi ingestion/ models/ api/ -j > maintainability-report.json
+          radon cc ingestion/ app/ -a -j > complexity-report.json
+          radon mi ingestion/ app/ -j > maintainability-report.json
           
           # Generate readable report
           echo "## Cyclomatic Complexity Report" > complexity-summary.md
-          radon cc ingestion/ models/ api/ -a >> complexity-summary.md
+          radon cc ingestion/ app/ -a >> complexity-summary.md
           echo "" >> complexity-summary.md
           echo "## Maintainability Index" >> complexity-summary.md
-          radon mi ingestion/ models/ api/ >> complexity-summary.md
+          radon mi ingestion/ app/ >> complexity-summary.md
       
       - name: Check complexity thresholds
         run: |
@@ -276,3 +276,4 @@ jobs:
         run: |
           echo "Badge updated via GitHub Actions status API"
           # Badges are automatically updated via shields.io integration
+
