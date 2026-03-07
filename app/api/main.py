@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
+from app.core.ai_pipeline import AIInsightsError, get_pipeline_status, run_ecommerce_analysis
 from app.core.reliability import (
     DataValidator,
     PerformanceMonitor,
@@ -304,6 +305,84 @@ async def get_metrics():
         "validation": perf_monitor.get_statistics("validation_time_ms"),
         "forecast": perf_monitor.get_statistics("forecast_time_ms"),
     }
+
+
+# ============================================================================
+# AI INSIGHTS (powered by ai-analyze-think-act-core)
+# ============================================================================
+
+
+class InsightsRequest(BaseModel):
+    """Request model for AI insights endpoint."""
+
+    goal: str = Field(
+        default="increase_revenue",
+        description="Business goal for the analysis (e.g. increase_revenue, reduce_churn)",
+    )
+    context: Optional[Dict] = Field(default=None, description="Optional extra context for the LLM")
+
+
+class InsightsResponse(BaseModel):
+    """Response model for AI insights endpoint."""
+
+    analysis: Dict
+    recommendations: List
+    metadata: Dict
+    pipeline_status: str
+
+
+@app.get("/api/v1/ai/status", tags=["ai-insights"])
+async def ai_pipeline_status():
+    """Return availability status of the AI analysis pipeline."""
+    return get_pipeline_status()
+
+
+@app.post(
+    "/api/v1/ai/insights",
+    response_model=InsightsResponse,
+    tags=["ai-insights"],
+    summary="Generate AI-powered business insights",
+)
+async def generate_insights(
+    request: InsightsRequest,
+    file: UploadFile = File(..., description="CSV file with e-commerce metrics"),
+):
+    """Run the full AI analysis pipeline (ingest→analyze→recommend) on uploaded data.
+
+    Powered by **ai-analyze-think-act-core**. Returns LLM-generated analysis and
+    prioritised recommendations for the specified business goal.
+
+    Requires `OPENAI_API_KEY` environment variable to be set.
+    """
+    # Parse uploaded CSV
+    try:
+        contents = await file.read()
+        df = pd.read_csv(io.BytesIO(contents))
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Failed to parse CSV: {exc}",
+        ) from exc
+
+    if df.empty:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Uploaded CSV is empty",
+        )
+
+    try:
+        result = run_ecommerce_analysis(df, goal=request.goal, extra_context=request.context)
+        return InsightsResponse(
+            analysis=result["analysis"],
+            recommendations=result["recommendations"],
+            metadata=result["metadata"],
+            pipeline_status="ok",
+        )
+    except AIInsightsError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
 
 
 # ============================================================================
