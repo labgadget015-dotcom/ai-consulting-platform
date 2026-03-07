@@ -1,3 +1,6 @@
+# AI Analysis Core
+git+https://github.com/labgadget015-dotcom/ai-analyze-think-act-core.git@main#egg=ai-analyze-think-act-core
+
 # Core Dependencies
 pandas==2.1.4
 numpy==1.26.2
