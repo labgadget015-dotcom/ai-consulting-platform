@@ -134,3 +134,15 @@ This is a private project for pilot customers. Contact the team for collaboratio
 ---
 
 **Status**: V1 Development | **Target**: 5-10 pilot customers by Q1 2026
+
+## Ecosystem
+
+This project is part of a connected suite of AI tools:
+
+| Repository | Description |
+|------------|-------------|
+| [ai-analyze-think-act-core](https://github.com/labgadget015-dotcom/ai-analyze-think-act-core) | 🧠 Core LLM analysis framework — powers the analysis engine behind this platform |
+| [ai-consulting-platform](https://github.com/labgadget015-dotcom/ai-consulting-platform) | 🛍️ E-commerce AI consulting platform (uses core) |
+| [analysis-os](https://github.com/labgadget015-dotcom/analysis-os) | 📊 Systematic analysis OS for consultants (uses core) |
+| [prompt-orchestrator](https://github.com/labgadget015-dotcom/prompt-orchestrator) | 🔀 Autonomous multi-stage prompt orchestration (uses core) |
+| [github-notifications-copilot](https://github.com/labgadget015-dotcom/github-notifications-copilot) | 🔔 AI-powered GitHub notification triage |
